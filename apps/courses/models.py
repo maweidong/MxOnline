@@ -4,6 +4,8 @@ from django.db import models
 
 from apps.users.models import BaseModel
 
+from apps.organizations.models import Teacher
+
 # 1、设计表结构
 """
 课程、章节、视频、课程资源
@@ -15,6 +17,7 @@ from apps.users.models import BaseModel
 # 3、每个字段的类型是否必填
 
 class Course(BaseModel):
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, verbose_name="讲师")
     name = models.CharField(verbose_name="课程名", max_length=50)
     desc = models.CharField(verbose_name="课程描述", max_length=300)
     learn_times = models.IntegerField(default=0, verbose_name="学习时长(分钟数)")
@@ -28,7 +31,7 @@ class Course(BaseModel):
     teacher_tell = models.CharField(verbose_name="老师告诉你", max_length=300, default="")
 
     detail = models.TextField(verbose_name="课程详情")
-    image = models.IntegerField(upload_to="courses/%Y/%m", verbose_name="封面图", max_length=100)
+    image = models.ImageField(upload_to="courses/%Y/%m", verbose_name="封面图", max_length=100)
 
     class Meta:
         verbose_name = "课程信息"
