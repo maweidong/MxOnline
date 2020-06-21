@@ -6,6 +6,7 @@ from apps.users.models import BaseModel
 
 from django.contrib.auth import get_user_model
 
+# 获取user模型
 UserProfile = get_user_model()
 
 
