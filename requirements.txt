@@ -3,3 +3,4 @@ mysqlclient
 pillow
 requests
 django-simple-captcha
+redis

@@ -1,10 +1,11 @@
+import redis
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.generic.base import View
 
-from MxOnline.settings import yp_apikey
+from MxOnline.settings import yp_apikey, REDIS_HOST, REDIS_PORT
 from apps.users.forms import LoginForm, DynamicLoginForm
 from apps.utils.YunPian import send_single_sms
 from apps.utils.random_str import generate_random
@@ -28,6 +29,9 @@ class SendSmsView(View):
             re_json = send_single_sms(yp_apikey, code, mobile=mobile)
             if re_json["code"] == 0:
                 re_dict["status"] = "success"
+                r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0, charset="utf8", decode_responses=True)
+                r.set(str(mobile), code)
+                r.expire(str(mobile), 300)  # 设置验证码5分钟过期
             else:
                 re_dict["msg"] = re_json["msg"]
 

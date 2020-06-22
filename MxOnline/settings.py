@@ -128,3 +128,7 @@ STATICFILES_DIRS = [
 
 # 云片网相关设置
 yp_apikey = ""
+
+# redis相关配置
+REDIS_HOST = "127.0.0.1"
+REDIS_PORT = 6379
