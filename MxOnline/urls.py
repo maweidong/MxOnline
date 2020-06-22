@@ -19,12 +19,14 @@ from django.urls import path, include
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 
-from apps.users.views import LoginView, LogoutView, SendSmsView
+from apps.users.views import LoginView, LogoutView, SendSmsView, DynamicLoginView, RegisterView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', TemplateView.as_view(template_name="index.html"), name="index"),
     path('login/', LoginView.as_view(), name="login"),
+    path('register/', RegisterView.as_view(), name="register"),
+    path('d_login/', DynamicLoginView.as_view(), name="d_login"),
     path('logout/', LogoutView.as_view(), name="logout"),
     url(r'^captcha/', include('captcha.urls')),
     url(r'^send_sms/', csrf_exempt(SendSmsView.as_view()), name="send_sms"),  # csrf_exempt用来去除token验证

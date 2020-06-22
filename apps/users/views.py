@@ -6,12 +6,76 @@ from django.urls import reverse
 from django.views.generic.base import View
 
 from MxOnline.settings import yp_apikey, REDIS_HOST, REDIS_PORT
-from apps.users.forms import LoginForm, DynamicLoginForm
+from apps.operations.models import UserProfile
+from apps.users.forms import LoginForm, DynamicLoginForm, DynamicLoginPostForm, RegisterGetForm, RegisterPostForm
 from apps.utils.YunPian import send_single_sms
 from apps.utils.random_str import generate_random
 
 
 # 基于CBV模式开发
+
+
+class RegisterView(View):
+    """注册"""
+
+    def get(self, request, *args, **kwargs):
+        register_get_form = RegisterGetForm()
+
+        return render(request, "register.html", {"register_get_form": register_get_form})
+
+    def post(self, request, *args, **kwargs):
+        register_post_form = RegisterPostForm(request.POST)
+        if register_post_form.is_valid():
+            # 没有注册账号依然可以登录
+            mobile = register_post_form.cleaned_data["mobile"]
+            password = register_post_form.cleaned_data["password"]
+            # 新建一个游客用户
+            user = UserProfile(username=mobile)
+            user.set_password(password)
+            user.mobile = mobile
+            user.save()
+            login(request, user)
+            return HttpResponseRedirect(reverse("index"))
+        else:
+            register_get_form = RegisterGetForm()
+            return render(request, "register.html", {"register_get_form": register_get_form,"register_post_form": register_post_form})
+
+
+class DynamicLoginView(View):
+    """
+    验证码动态登录
+    """
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return HttpResponseRedirect(reverse("index"))
+
+        login_form = DynamicLoginForm()
+        return render(request, "login.html", {
+            "login_form": login_form
+        })
+
+    def post(self, request, *args, **kwargs):
+        login_form = DynamicLoginPostForm(request.POST)
+        if login_form.is_valid():
+            # 没有注册账号依然可以登录
+            mobile = login_form.cleaned_data["mobile"]
+            existed_users = UserProfile.objects.filter(mobile=mobile)
+            if existed_users:
+                user = existed_users[0]
+            else:
+                # 新建一个游客用户
+                user = UserProfile(username=mobile)
+                password = generate_random(10, 2)
+                user.set_password(password)
+                user.mobile = mobile
+                user.save()
+            login(request, user)
+            return HttpResponseRedirect(reverse("index"))
+        else:
+            d_form = DynamicLoginForm()
+            return render(request, "login.html", {"login.html": login_form, "d_form": d_form})
+
 
 class SendSmsView(View):
     """
