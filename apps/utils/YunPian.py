@@ -1,3 +1,5 @@
+import json
+
 import requests
 
 
@@ -11,4 +13,4 @@ def send_single_sms(apikey, code, mobile):
         "mobile": mobile,
         "text": text
     })
-    return res
+    return json.loads(res.text)

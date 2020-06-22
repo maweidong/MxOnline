@@ -1,20 +1,45 @@
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
-
-# Create your views here.
-
-
-# 基于CBV模式开发
 from django.urls import reverse
 from django.views.generic.base import View
 
-from apps.users.forms import LoginForm
+from MxOnline.settings import yp_apikey
+from apps.users.forms import LoginForm, DynamicLoginForm
+from apps.utils.YunPian import send_single_sms
+from apps.utils.random_str import generate_random
+
+
+# 基于CBV模式开发
+
+class SendSmsView(View):
+    """
+    发送短信
+    """
+
+    def post(self, request, *args, **kwargs):
+        send_sms_form = DynamicLoginForm(request.POST)
+        re_dict = {}
+        if send_sms_form.is_valid():
+            mobile = send_sms_form.cleaned_data["mobile"]
+            # 随机生成数字验证码
+            code = generate_random(4, 0)
+
+            re_json = send_single_sms(yp_apikey, code, mobile=mobile)
+            if re_json["code"] == 0:
+                re_dict["status"] = "success"
+            else:
+                re_dict["msg"] = re_json["msg"]
+
+        else:
+            for key, value in send_sms_form.errors.items():
+                re_dict[key] = value[0]
+            return JsonResponse(re_dict)
 
 
 class LogoutView(View):
     """
-    退出
+    退出登录
     """
 
     def get(self, request, *args, **kwargs):
@@ -31,7 +56,12 @@ class LoginView(View):
         # 判断用户是否登录
         if request.user.is_authenticated:
             return HttpResponseRedirect(reverse("index"))
-        return render(request, "login.html")
+
+        login_form = DynamicLoginForm(request.POST)
+
+        return render(request, "login.html", {
+            "login_form": login_form
+        })
 
     def post(self, request, *args, **kwargs):
         # 表单验证

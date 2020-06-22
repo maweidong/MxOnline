@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'apps.users.apps.UsersConfig',
     'apps.operations.apps.OperationsConfig',
     'apps.organizations.apps.OrganizationsConfig',
+    'captcha',
 ]
 
 MIDDLEWARE = [
@@ -124,3 +125,6 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
     os.path.join(BASE_DIR, 'apps/message_form/static'),
 ]
+
+# 云片网相关设置
+yp_apikey = ""
