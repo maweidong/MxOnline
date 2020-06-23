@@ -21,7 +21,6 @@ from django.views.generic import TemplateView
 from django.views.static import serve
 
 from MxOnline.settings import MEDIA_ROOT
-from apps.organizations.views import OrgView
 from apps.users.views import LoginView, LogoutView, SendSmsView, DynamicLoginView, RegisterView
 
 urlpatterns = [
