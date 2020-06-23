@@ -35,6 +35,10 @@ class CourseOrg(BaseModel):
         courses = self.course_set.filter(is_classics=True)[:3]
         return courses
 
+
+    # def teachers(self):
+    #     return self.teacher_set.all()
+
     class Meta:
         verbose_name = "课程机构"
         verbose_name_plural = verbose_name
