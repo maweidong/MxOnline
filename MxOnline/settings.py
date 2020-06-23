@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'apps.operations.apps.OperationsConfig',
     'apps.organizations.apps.OrganizationsConfig',
     'captcha',
+    'pure_pagination',
 ]
 
 MIDDLEWARE = [
@@ -66,6 +67,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',
             ],
         },
     },
@@ -132,3 +134,13 @@ yp_apikey = ""
 # redis相关配置
 REDIS_HOST = "127.0.0.1"
 REDIS_PORT = 6379
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media'),
+
+# 分页相关设置
+PAGINATION_SETINGS = {
+    'PAGE_RANGE_DISPLAYED': 10,
+    'MARGIN_PAGES_DISPLAYED': 2,
+    'SHOW_FIRST_PAGE_WHEN_INVALID': True
+}
