@@ -1,5 +1,6 @@
 import redis
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
@@ -13,6 +14,12 @@ from apps.utils.random_str import generate_random
 
 
 # 基于CBV模式开发
+
+class UserInfoView(LoginRequiredMixin, View):
+    login_url = "/login/"
+
+    def get(self, request, *args, **kwargs):
+        return render(request, "usercenter-info.html")
 
 
 class RegisterView(View):

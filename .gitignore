@@ -124,7 +124,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-.idea/workspace.xml
+.idea/
 apps/courses/migrations/
 apps/organizations/migrations/
 apps/operations/migrations/
