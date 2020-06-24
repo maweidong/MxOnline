@@ -8,19 +8,38 @@ from django.views.generic.base import View
 
 from MxOnline.settings import yp_apikey, REDIS_HOST, REDIS_PORT
 from apps.operations.models import UserProfile
-from apps.users.forms import LoginForm, DynamicLoginForm, DynamicLoginPostForm, RegisterGetForm, RegisterPostForm
+from apps.users.forms import LoginForm, DynamicLoginForm, DynamicLoginPostForm, RegisterGetForm, RegisterPostForm, \
+    UploadImageForm
 from apps.utils.YunPian import send_single_sms
 from apps.utils.random_str import generate_random
 
 
 # 基于CBV模式开发
-class UploadImageView(LoginRequiredMixin,View):
+class UploadImageView(LoginRequiredMixin, View):
     login_url = "/login/"
 
+    # def save_file(self, file):
+    #     with open("", "wb") as f:
+    #         for chunk in file.chunks():
+    #             f.write(chunk)
+
     def post(self, request, *args, **kwargs):
-        #处理用户上传的头像
+        # 处理用户上传的头像
+        image_form = UploadImageForm(request.POST, request.FILES, instance=request.user)
+        if image_form.is_valid():
+            image_form.save()
+            return JsonResponse({
+                "status": "success"
+            })
+        else:
+            return JsonResponse({
+                "status": "fail"
+            })
 
+        # files = request.FILES['image']
+        # self.save_file(files)
 
+        # 1. 如果同一个文件上传多次，相同名称的文件应该如何处理
 
 
 class UserInfoView(LoginRequiredMixin, View):

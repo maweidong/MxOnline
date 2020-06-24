@@ -6,6 +6,13 @@ from MxOnline.settings import REDIS_HOST, REDIS_PORT
 from apps.operations.models import UserProfile
 
 
+class UploadImageForm(forms.ModelForm):
+
+    class Meta:
+        model = UserProfile
+        fields = ["image"]
+
+
 class RegisterGetForm(forms.Form):
     # 获取图片验证码
     captcha = CaptchaField()
