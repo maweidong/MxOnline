@@ -14,6 +14,14 @@ from apps.utils.random_str import generate_random
 
 
 # 基于CBV模式开发
+class UploadImageView(LoginRequiredMixin,View):
+    login_url = "/login/"
+
+    def post(self, request, *args, **kwargs):
+        #处理用户上传的头像
+
+
+
 
 class UserInfoView(LoginRequiredMixin, View):
     login_url = "/login/"
