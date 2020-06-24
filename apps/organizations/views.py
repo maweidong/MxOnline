@@ -10,6 +10,32 @@ from apps.organizations.models import CourseOrg, City, Teacher
 from pure_pagination import Paginator, PageNotAnInteger
 
 
+class TeacherDetailView(View):
+    """
+    讲师详情
+    """
+
+    def get(self, request, teacher_id, *args, **kwargs):
+        teacher = Teacher.objects.get(id=int(teacher_id))
+
+        teacher_fav = False
+        org_fav = False
+        if request.user.is_authenticated:
+            if UserFavorite.objects.filter(user=request.user, fav_type=3, fav_id=teacher.id):
+                teacher_fav = True
+
+            if UserFavorite.objects.filter(user=request.user, fav_type=2, fav_id=teacher.org.id):
+                org_fav = True
+        hot_teachers = Teacher.objects.all().order_by("-click_nums")[:3]
+
+        return render(request, "teacher-detail.html", {
+            "teacher": teacher,
+            "teacher_fav": teacher_fav,
+            "org_fav": org_fav,
+            "hot_teachers": hot_teachers
+        })
+
+
 class TeacherListView(View):
     """
     老师列表
@@ -18,6 +44,13 @@ class TeacherListView(View):
     def get(self, request, *args, **kwargs):
         all_teachers = Teacher.objects.all()
         teacher_nums = all_teachers.count()
+
+        hot_teachers = Teacher.objects.all().order_by("-click_nums")[:3]
+
+        # 对讲师进行排序
+        sort = request.GET.get("sort", "")
+        if sort == "students":
+            all_teachers = all_teachers.order_by("-click_nums")
 
         # 对讲师数据进行分页
         try:
@@ -30,7 +63,9 @@ class TeacherListView(View):
 
         return render(request, "teacher-list.html", {
             "teachers": teachers,
-            "teacher_nums": teacher_nums
+            "teacher_nums": teacher_nums,
+            "sort": sort,
+            "hot_teachers": hot_teachers
         })
 
 
