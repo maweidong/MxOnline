@@ -5,12 +5,40 @@ from django.views import View
 
 from apps.operations.models import UserFavorite
 from apps.organizations.forms import AddAskForm
-from apps.organizations.models import CourseOrg, City
+from apps.organizations.models import CourseOrg, City, Teacher
 
 from pure_pagination import Paginator, PageNotAnInteger
 
 
+class TeacherListView(View):
+    """
+    老师列表
+    """
+
+    def get(self, request, *args, **kwargs):
+        all_teachers = Teacher.objects.all()
+        teacher_nums = all_teachers.count()
+
+        # 对讲师数据进行分页
+        try:
+            page = request.GET.get('page', 10)
+        except PageNotAnInteger:
+            page = 1
+
+        p = Paginator(all_teachers, per_page=5, request=request)
+        teachers = p.page(page)
+
+        return render(request, "teacher-list.html", {
+            "teachers": teachers,
+            "teacher_nums": teacher_nums
+        })
+
+
 class OrgDescView(View):
+    """
+    机构描述
+    """
+
     def get(self, request, org_id, *args, **kwargs):
         current_page = "desc"
         course_org = CourseOrg.objects.filter(id=int(org_id))

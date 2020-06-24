@@ -38,7 +38,8 @@ class RegisterView(View):
             return HttpResponseRedirect(reverse("index"))
         else:
             register_get_form = RegisterGetForm()
-            return render(request, "register.html", {"register_get_form": register_get_form,"register_post_form": register_post_form})
+            return render(request, "register.html",
+                          {"register_get_form": register_get_form, "register_post_form": register_post_form})
 
 
 class DynamicLoginView(View):
@@ -50,9 +51,11 @@ class DynamicLoginView(View):
         if request.user.is_authenticated:
             return HttpResponseRedirect(reverse("index"))
 
+        next = request.GET.get("next", "")
         login_form = DynamicLoginForm()
         return render(request, "login.html", {
-            "login_form": login_form
+            "login_form": login_form,
+            "next": next
         })
 
     def post(self, request, *args, **kwargs):
@@ -71,6 +74,11 @@ class DynamicLoginView(View):
                 user.mobile = mobile
                 user.save()
             login(request, user)
+
+            next = request.GET.get("next", "")
+            if next:
+                return HttpResponseRedirect(next)
+
             return HttpResponseRedirect(reverse("index"))
         else:
             d_form = DynamicLoginForm()
@@ -125,10 +133,14 @@ class LoginView(View):
         if request.user.is_authenticated:
             return HttpResponseRedirect(reverse("index"))
 
+        # 登录成功之后返回原页面
+        next = request.GET.get("next", "")
+
         login_form = DynamicLoginForm(request.POST)
 
         return render(request, "login.html", {
-            "login_form": login_form
+            "login_form": login_form,
+            "next": next
         })
 
     def post(self, request, *args, **kwargs):
@@ -144,6 +156,11 @@ class LoginView(View):
             if user is not None:
                 # django自带login方法，自动设置sessionid
                 login(request, user)
+
+                # 登录成功之后返回原页面
+                next = request.GET.get("next", "")
+                if next:
+                    return HttpResponseRedirect(next)
 
                 return HttpResponseRedirect(reverse("index"))
             else:

@@ -33,6 +33,7 @@ class Course(BaseModel):
     is_classics = models.BooleanField(default=False, verbose_name="是否经典")
     detail = models.TextField(verbose_name="课程详情")
     image = models.ImageField(upload_to="courses/%Y/%m", verbose_name="封面图", max_length=100)
+    notice = models.CharField(verbose_name="课程公告", max_length=300, default="")
 
     class Meta:
         verbose_name = "课程信息"
@@ -57,7 +58,6 @@ class CourseTag(BaseModel):
         return self.tag
 
 
-
 class Lesson(BaseModel):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name="课程")  # 级联删除
     name = models.CharField(max_length=100, verbose_name="章节名")
@@ -72,7 +72,7 @@ class Video(BaseModel):
     lesson = models.ForeignKey(Lesson, verbose_name="章节", on_delete=models.CASCADE)  # 级联删除
     name = models.CharField(max_length=100, verbose_name="视频名")
     learn_times = models.IntegerField(default=0, verbose_name="学习时长(分钟数)")
-    url = models.CharField(max_length=200, verbose_name="访问地址")
+    url = models.CharField(max_length=1000, verbose_name="访问地址")
 
     class Meta:
         verbose_name = "视频"
