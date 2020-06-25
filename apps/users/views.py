@@ -8,13 +8,39 @@ from django.views.generic.base import View
 
 from MxOnline.settings import yp_apikey, REDIS_HOST, REDIS_PORT
 from apps.operations.models import UserProfile
-from apps.users.forms import LoginForm, DynamicLoginForm, DynamicLoginPostForm, RegisterGetForm, RegisterPostForm, \
+from apps.users.forms import LoginForm, DynamicLoginForm, UserInfoForm, DynamicLoginPostForm, UpdateMobileForm, \
+    RegisterGetForm, \
+    RegisterPostForm, \
     UploadImageForm
 from apps.utils.YunPian import send_single_sms
 from apps.utils.random_str import generate_random
 
 
 # 基于CBV模式开发
+
+class ChangeMobileView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        mobile_form = UpdateMobileForm(request.POST)
+        if mobile_form.is_valid():
+            mobile = mobile_form.cleaned_data["mobile"]
+            # 已经存在的记录不能重复注册
+            if UserProfile.objects.filter(mobile=mobile):
+                return JsonResponse({
+                    "mobile": "该手机号码已经被占用"
+                })
+            user = request.user
+            user.mobile = mobile
+            user.username = mobile
+            user.save()
+            return JsonResponse({
+                "status": "success"
+            })
+        else:
+            return JsonResponse({
+                "status": "success"
+            })
+
+
 class UploadImageView(LoginRequiredMixin, View):
     login_url = "/login/"
 
@@ -46,7 +72,20 @@ class UserInfoView(LoginRequiredMixin, View):
     login_url = "/login/"
 
     def get(self, request, *args, **kwargs):
-        return render(request, "usercenter-info.html")
+        captcha_form = RegisterGetForm()
+        return render(request, "usercenter-info.html", {
+            "captcha_form": captcha_form
+        })
+
+    def post(self, request, *args, **kwargs):
+        user_info_form = UserInfoForm(request.POST, instance=request.user)
+        if user_info_form.is_valid():
+            user_info_form.save()
+            return JsonResponse({
+                "status": "success"
+            })
+        else:
+            return JsonResponse(user_info_form.errors)
 
 
 class RegisterView(View):
